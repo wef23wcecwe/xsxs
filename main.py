@@ -3518,7 +3518,7 @@ async def tcp_to_ws(websocket, reader, conn_id, link_uid, resp_prefix: bytes = b
     except Exception:
         pass
 
-@app.websocket("/ws/{uuid}")
+# @app.websocket("/ws/{uuid}")
 async def websocket_tunnel(websocket: WebSocket, uuid: str):
     auth = websocket.query_params.get("auth", "vless")
     await ensure_default_link()
@@ -3705,6 +3705,15 @@ async def websocket_tunnel(websocket: WebSocket, uuid: str):
 # ══════════════════════════════════════════════════════════════════════════════
 from xhttp_transport import router as xhttp_router
 app.include_router(xhttp_router)
+
+
+
+# ⭐ رله بهینه VLESS (بر اساس PXPANEL)
+# این خط، تابع websocket_tunnel_v2 رو از فایل relay_vless_new.py import می‌کنه
+# و مسیر /ws/{uuid} رو بهش وصل می‌کنه
+from relay_vless_new import websocket_tunnel_v2
+app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel_v2)
+
 # ═══════════════════════════════════════════════════════════════════════
 # Node System — فایل nodes.py رو import کن
 # ═══════════════════════════════════════════════════════════════════════
