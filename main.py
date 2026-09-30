@@ -1072,7 +1072,7 @@ def generate_vless_link(
     use_port = DEFAULT_PORT
 
     if transport == "ws":
-        path = f"/ws/{auth}/{uuid}?ed=2048"
+        path = f"/ws/{uuid}"
         base_params = {"security": "tls", "type": "ws", "host": domain, "path": path, "sni": domain, "fp": fp, "alpn": alpn_val}
     else:
         # xhttp-packet-up / xhttp-stream-up
@@ -3518,8 +3518,9 @@ async def tcp_to_ws(websocket, reader, conn_id, link_uid, resp_prefix: bytes = b
     except Exception:
         pass
 
-@app.websocket("/ws/{auth}/{uuid}")
-async def websocket_tunnel(websocket: WebSocket, auth: str, uuid: str):
+@app.websocket("/ws/{uuid}")
+async def websocket_tunnel(websocket: WebSocket, uuid: str):
+    auth = websocket.query_params.get("auth", "vless")
     await ensure_default_link()
 
     if auth not in AUTH_TYPES:
