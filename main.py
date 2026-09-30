@@ -3709,10 +3709,9 @@ app.include_router(xhttp_router)
 
 
 # ⭐ رله بهینه VLESS (بر اساس PXPANEL)
-# این خط، تابع websocket_tunnel_v2 رو از فایل relay_vless_new.py import می‌کنه
-# و مسیر /ws/{uuid} رو بهش وصل می‌کنه
-from relay_vless_new import websocket_tunnel_v2
-app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel_v2)
+# این import به آخر فایل منتقل شد (به خاطر circular import)
+# from relay_vless_new import websocket_tunnel_v2
+# app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel_v2)
 
 # ═══════════════════════════════════════════════════════════════════════
 # Node System — فایل nodes.py رو import کن
@@ -6663,6 +6662,16 @@ async def api_node_report_usage(request: Request):
     finally:
         conn.close()    
         
+# ═══════════════════════════════════════════════════════════════════
+# ⭐ رله بهینه VLESS — اینجا import می‌کنیم تا circular import نشه
+# ═══════════════════════════════════════════════════════════════════
+try:
+    from relay_vless_new import websocket_tunnel_v2
+    app.add_api_websocket_route("/ws/{uuid}", websocket_tunnel_v2)
+    logger.info("[RELAY] relay_vless_new loaded successfully")
+except Exception as e:
+    logger.error(f"[RELAY] Failed to load relay_vless_new: {e}")
+
+
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=CONFIG["port"])
-    
